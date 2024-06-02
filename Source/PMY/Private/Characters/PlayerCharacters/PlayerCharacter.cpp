@@ -10,12 +10,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
 // ATP_ThirdPersonCharacter
-
 APlayerCharacter::APlayerCharacter()
 {
 	// Set size for collision capsule
@@ -50,6 +50,10 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
+	FPSCamera->SetupAttachment(GetMesh(), TEXT("head"));
+	FPSCamera->bUsePawnControlRotation = true;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -58,6 +62,52 @@ void APlayerCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void APlayerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (bCheckAimOnTick)
+	{
+		FCollisionQueryParams& Params = FCollisionQueryParams::DefaultQueryParam;
+		Params.AddIgnoredActor(this);
+		
+		APlayerCameraManager* CameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+		FVector StartPoint = CameraManager->GetCameraLocation();
+		FVector EndPoint = CameraManager->GetCameraLocation() + (CameraManager->GetActorForwardVector() * 10000);
+		bHitUnderAimOnTick = GetWorld()->LineTraceSingleByChannel(HitUnderAimOnTick, StartPoint, EndPoint, ECollisionChannel::ECC_Visibility, Params);
+		if(!bHitUnderAimOnTick)
+		{
+			FHitResult HitResultWhenNoHit = FHitResult();
+			HitResultWhenNoHit.Location = EndPoint;
+			HitResultWhenNoHit.ImpactPoint = EndPoint;
+			HitResultWhenNoHit.ImpactNormal = GetActorForwardVector();
+			HitResultWhenNoHit.Normal = GetActorForwardVector();
+			HitUnderAimOnTick = HitResultWhenNoHit;
+		}
+	}
+	
+}
+
+bool APlayerCharacter::TryChangeWeaponActionState(EWeaponActionState NewState)
+{
+	if(true) //TODO : Add condition
+	{
+		WeaponActionState = NewState;
+		return true;
+	}
+	return false;
+}
+
+bool APlayerCharacter::TryChangeCrowdControlState(ECrowdControlState NewState)
+{
+	if(true) //TODO : Add condition
+	{
+		CrowdControlState = NewState;
+		return true;
+	}
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
