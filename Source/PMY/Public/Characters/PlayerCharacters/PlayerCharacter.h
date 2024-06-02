@@ -7,6 +7,8 @@
 #include "Logging/LogMacros.h"
 #include "PlayerCharacter.generated.h"
 
+class UWeaponInputMap;
+class UWeaponComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -41,6 +43,8 @@ class APlayerCharacter : public AMyCharacter
 {
 	GENERATED_BODY()
 
+#pragma region Components
+public:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -52,7 +56,30 @@ class APlayerCharacter : public AMyCharacter
 	/** FPS Camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FPSCamera;
+
+	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UWeaponComponent* WeaponComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivate))
+	TObjectPtr<UWeaponInputMap> WeaponInputMap;
+
+	//TODO : Asset Table 참조로 변경 예정
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UWeaponComponent> WeaponComponentClass;
 	
+
+public:
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	/** Returns FPSCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFPSCamera() const { return FPSCamera; }
+
+#pragma endregion Components
+
+#pragma region Inputs
+public:
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -68,24 +95,40 @@ class APlayerCharacter : public AMyCharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
-
-public:
-	APlayerCharacter();
 	
-
 protected:
-
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-			
 
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+#pragma endregion Inputs
+#pragma region Weapon Inputs
+	UFUNCTION()
+	void TryContinuousPrimaryFire(const FInputActionValue& Value);
+	UFUNCTION()
+	void TryContinuousSecondaryFire(const FInputActionValue& Value);
+#pragma endregion Weapon Inputs
+
+#pragma region Character Properties
+
+public:
+	UFUNCTION(BlueprintCallable)
+	FVector GetAimStartWorldLocation() const;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	FVector AimStartOffset;
 	
+	
+#pragma endregion Character Properties
+
+public:
+	APlayerCharacter();
 	// To add mapping context
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaSeconds) override;
@@ -103,21 +146,19 @@ public:
 
 #pragma endregion  Tick Events variables
 	
-public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-	/** Returns FPSCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFPSCamera() const { return FPSCamera; }
+
+#pragma region states
 
 public:
 	bool TryChangeWeaponActionState(EWeaponActionState NewState);
 	bool TryChangeCrowdControlState(ECrowdControlState NewState);
 	FORCEINLINE EWeaponActionState GetWeaponActionState() const { return WeaponActionState; }
 	FORCEINLINE ECrowdControlState GetCrowdControlState() const { return CrowdControlState; }
+	
 private:
 	EWeaponActionState WeaponActionState = EWeaponActionState::DoNothing;
 	ECrowdControlState CrowdControlState = ECrowdControlState::Normal;
+
+#pragma endregion states
 };
 

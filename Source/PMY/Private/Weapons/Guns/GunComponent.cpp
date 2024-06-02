@@ -3,6 +3,7 @@
 
 #include "Weapons/Guns/GunComponent.h"
 
+#include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Characters/PlayerCharacters/PlayerCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -26,21 +27,20 @@ void UGunComponent::BeginPlay()
 	}
 }
 
-bool UGunComponent::TryWeaponPrimaryFire()
+
+
+void UGunComponent::TryContinuousPrimaryFire(const FInputActionValue& Value)
 {
+	Super::TryContinuousPrimaryFire(Value);
 	if(Owner->GetWeaponActionState() == EWeaponActionState::DoNothing &&
 		Owner->GetCrowdControlState() == ECrowdControlState::Normal)
 	{
 		DoWeaponPrimaryFire();
-		return true;
 	}
 	
-	return false;
 }
 
 void UGunComponent::DoWeaponPrimaryFire()
 {
-	DrawDebugLine(GetWorld(), Owner->GetActorLocation(), Owner->HitUnderAimOnTick.ImpactPoint, FColor::Red, false, 1.0f, 0, 1.0f);
+	DrawDebugLine(GetWorld(), Owner->GetAimStartWorldLocation(), Owner->HitUnderAimOnTick.ImpactPoint, FColor::Red, false, -1.0f, 0, 1.0f);
 }
-
-

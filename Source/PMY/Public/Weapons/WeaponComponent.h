@@ -18,7 +18,7 @@ struct FWeaponCameraSet
 	UPROPERTY(EditAnywhere)
 	float FOV = 90.0f;
 	UPROPERTY(EditAnywhere)
-	float CameraDistance = 100.0f;
+	float CameraDistance = 400.0f;
 	UPROPERTY(EditAnywhere)
 	FVector CameraOffset = FVector(0.0f, 0.0f, 0.0f);
 	UPROPERTY(EditAnywhere)
@@ -36,6 +36,11 @@ public:
 
 	FWeaponCameraSet GetCameraSet() const { return CameraSet; }
 
+	UFUNCTION(BlueprintCallable)
+	bool EquipWeapon();
+	UFUNCTION(BlueprintCallable)
+	bool UnEquipWeapon();
+
 protected:
 	APlayerCharacter* Owner;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
@@ -43,5 +48,20 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
 	FWeaponCameraSet CameraSet;
+
+#pragma region Inputs
+public:
+	UFUNCTION()
+	virtual void SetPlayerInputComponent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponInput", meta = (AllowPrivate))
+	UInputMappingContext* WeaponMappingContext;
+
+#pragma endregion Inputs
+#pragma region Actions
+	UFUNCTION(BlueprintCallable)
+	virtual void TryContinuousPrimaryFire(const FInputActionValue& Value);
+	UFUNCTION(BlueprintCallable)
+	virtual void TryContinuousSecondaryFire(const FInputActionValue& Value);
 	
 };

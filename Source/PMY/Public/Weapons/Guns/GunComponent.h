@@ -23,7 +23,7 @@ enum class ELoadType : uint8
 {
 	FullyAutomatic = 0	UMETA(DisplayName = "Fully Automatic"),
 	SemiAutomatic = 1 	UMETA(DisplayName = "Semi Automatic"),
-	BoltAction = 2 		UMETA(DisplayName = "Bolt Action"),
+	ManulLoading = 2 		UMETA(DisplayName = "Bolt Action"),
 };
 
 UCLASS()
@@ -33,19 +33,35 @@ class PMY_API UGunComponent : public UWeaponComponent
 public:
 	virtual void BeginPlay() override;
 
-public:
-	UFUNCTION(BlueprintCallable)
-	bool TryWeaponPrimaryFire();
 
-	UFUNCTION(BlueprintCallable)
-	void DoWeaponPrimaryFire();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun", meta = (AllowPrivate))
 	FGunCameraSet GunCameraSet;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun", meta = (AllowPrivate))
+	ELoadType LoadType = ELoadType::FullyAutomatic;
 
-private:
+#pragma region Inputs
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponInput", meta = (AllowPrivate))
+	UInputAction* PrimaryFire;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponInput", meta = (AllowPrivate))
+	UInputAction* SecondaryFire;
+
+#pragma endregion Inputs
+
+#pragma region Actions
+
+public:
+	virtual void TryContinuousPrimaryFire(const FInputActionValue& Value) override;
+
+	UFUNCTION(BlueprintCallable)
+	void DoWeaponPrimaryFire();
+
+#pragma endregion Actions
+	
 	
 };

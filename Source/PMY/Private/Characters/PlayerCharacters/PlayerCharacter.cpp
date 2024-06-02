@@ -10,7 +10,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Datas/WeaponInputMap.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/MySingleton.h"
+#include "Weapons/WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -53,6 +56,7 @@ APlayerCharacter::APlayerCharacter()
 	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
 	FPSCamera->SetupAttachment(GetMesh(), TEXT("head"));
 	FPSCamera->bUsePawnControlRotation = true;
+	
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -62,6 +66,15 @@ void APlayerCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	if(WeaponComponentClass)
+	{
+		WeaponComponent = NewObject<UWeaponComponent>(this, WeaponComponentClass);
+		WeaponComponent->RegisterComponent();
+		//WeaponComponent->SetupAttachment(GetMesh(), TEXT("hand_r"));
+		WeaponComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r"));	
+	}
+	
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -115,6 +128,7 @@ bool APlayerCharacter::TryChangeCrowdControlState(ECrowdControlState NewState)
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	InputComponent = PlayerInputComponent;
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
 	{
@@ -136,11 +150,40 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+
+		// Weapon Input Map
+		//TObjectPtr<UWeaponInputMap> WeaponInputMap = Cast<UMySingleton>(GEngine->GameSingleton)->WeaponInputMapData;
+		if (WeaponInputMap)
+		{
+			EnhancedInputComponent->BindAction(WeaponInputMap->PrimaryFire, ETriggerEvent::Triggered, this, &APlayerCharacter::TryContinuousPrimaryFire);
+			EnhancedInputComponent->BindAction(WeaponInputMap->SecondaryFire, ETriggerEvent::Triggered, this, &APlayerCharacter::TryContinuousSecondaryFire);
+		}
 	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+}
+
+void APlayerCharacter::TryContinuousPrimaryFire(const FInputActionValue& Value)
+{
+	if(WeaponComponent)
+	{
+		WeaponComponent->TryContinuousPrimaryFire(Value);
+	}
+}
+
+void APlayerCharacter::TryContinuousSecondaryFire(const FInputActionValue& Value)
+{
+	if(WeaponComponent)
+	{
+		WeaponComponent->TryContinuousSecondaryFire(Value);
+	}
+}
+
+FVector APlayerCharacter::GetAimStartWorldLocation() const
+{
+	return GetActorTransform().TransformPosition(AimStartOffset);
 }
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
