@@ -56,7 +56,8 @@ APlayerCharacter::APlayerCharacter()
 	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
 	FPSCamera->SetupAttachment(GetMesh(), TEXT("head"));
 	FPSCamera->bUsePawnControlRotation = true;
-	
+
+	TeamNumber = 1;
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -101,6 +102,14 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 		}
 	}
 	
+}
+
+float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	//TODO : 체력 감소 조건 및 액션이벤트, 감쇄효과 등 추가
+	Health -= DamageAmount;
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 bool APlayerCharacter::TryChangeWeaponActionState(EWeaponActionState NewState)

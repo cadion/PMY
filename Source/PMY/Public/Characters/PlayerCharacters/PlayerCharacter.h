@@ -132,6 +132,7 @@ public:
 	// To add mapping context
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaSeconds) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 #pragma region Tick Events variables
 public:

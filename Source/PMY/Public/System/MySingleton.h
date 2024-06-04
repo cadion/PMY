@@ -18,7 +18,7 @@ class PMY_API UMySingleton : public UObject
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widgets")
-	TSubclassOf<UDynamicActionGroupWidget> DynamicActionGroupClass;
+	TSubclassOf<UUserWidget> DynamicActionGroupClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UWeaponInputMap> WeaponInputMapData;

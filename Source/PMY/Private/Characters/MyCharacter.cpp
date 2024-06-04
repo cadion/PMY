@@ -32,3 +32,21 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+void AMyCharacter::TryDeath(float TimeToDeath)
+{
+	//TODO: 죽지 않을 조건 추가
+	bool bCanDie = true;
+	if(bCanDie)
+	{
+		//TODO: 죽기 전 애니메이션 등 액션 추가
+		FTimerHandle DeathTimerHandle;
+		GetWorldTimerManager().SetTimer(DeathTimerHandle, this, &AMyCharacter::Death, TimeToDeath, false);	
+	}
+}
+
+void AMyCharacter::Death()
+{
+	//TODO: 죽기 직전 폭발 등 효과 추가
+	Destroy();
+}
+

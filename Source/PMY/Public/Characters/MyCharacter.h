@@ -26,4 +26,26 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyCharacter")
+	int TeamNumber = 0; // 0 is neutral, 1 is player, 2 is enemy
+
+#pragma region Common Properties
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyCharacter")
+	float MaxHealth = 100.0f;
+	UPROPERTY(BlueprintReadWrite, Category = "MyCharacter")
+	float Health = MaxHealth;
+
+#pragma endregion Common Properties
+
+#pragma region Common Action
+
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual void TryDeath(float TimeToDeath = 1.0f);
+	UFUNCTION(BlueprintCallable)
+	void Death();
+
+#pragma endregion Common Action
 };

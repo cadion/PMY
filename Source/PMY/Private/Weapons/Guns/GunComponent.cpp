@@ -6,7 +6,9 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Characters/PlayerCharacters/PlayerCharacter.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 class APlayerCharacter;
 
@@ -42,5 +44,23 @@ void UGunComponent::TryContinuousPrimaryFire(const FInputActionValue& Value)
 
 void UGunComponent::DoWeaponPrimaryFire()
 {
-	DrawDebugLine(GetWorld(), Owner->GetAimStartWorldLocation(), Owner->HitUnderAimOnTick.ImpactPoint, FColor::Red, false, -1.0f, 0, 1.0f);
+	FVector HandBonePosition = Owner->GetMesh()->GetSocketLocation("hand_r");
+	//Owner->GetAimStartWorldLocation()
+	DrawDebugLine(GetWorld(), HandBonePosition, Owner->HitUnderAimOnTick.ImpactPoint, FColor::Red, false, -1.0f, 0, 1.0f);
+	if(Owner->bHitUnderAimOnTick)
+	{
+		AActor* Target = Owner->HitUnderAimOnTick.GetActor();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit Actor : %s"), *Target->GetName()));
+		if(Target)
+		{
+			//I want Apply damage to "Target"
+			UGameplayStatics::ApplyDamage(Target, GetWeaponATK(), Owner->GetController(), Owner, UDamageType::StaticClass());
+			UPrimitiveComponent* PrimitiveRoot = Cast<UPrimitiveComponent>(Target->GetRootComponent());
+			if(PrimitiveRoot)
+			{
+				FVector HitDirection = Owner->HitUnderAimOnTick.ImpactPoint - HandBonePosition;
+				PrimitiveRoot->AddImpulseAtLocation(HitDirection * Momentum, Owner->HitUnderAimOnTick.ImpactPoint);
+			}
+		}
+	}
 }

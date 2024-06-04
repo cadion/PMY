@@ -15,15 +15,4 @@ void UMyGameInstance::Init()
 {
 	Super::Init();
 	MySingleton = Cast<UMySingleton>(GEngine->GameSingleton);
-	if(MySingleton)
-	{
-		if(MySingleton->DynamicActionGroupClass)
-		{
-			DynamicActionGroup = CreateWidget<UDynamicActionGroupWidget>(this, MySingleton->DynamicActionGroupClass);
-			if(DynamicActionGroup)
-			{
-				DynamicActionGroup->AddToViewport();
-			}
-		}
-	}
 }

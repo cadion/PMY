@@ -49,6 +49,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
 	FWeaponCameraSet CameraSet;
 
+
+#pragma region WeaponParameters
+public:
+	UFUNCTION(BlueprintCallable)
+	float GetWeaponATK() const { return WeaponATK; }
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponATK(float NewWeaponATK) { WeaponATK = NewWeaponATK; }
+	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
+	float WeaponATK = 100.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
+	float Momentum = 0.3f * 330.0f; // kg * cm / s
+
+#pragma endregion WeaponParameters
+
 #pragma region Inputs
 public:
 	UFUNCTION()
