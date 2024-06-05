@@ -42,7 +42,8 @@ public:
 	bool UnEquipWeapon();
 
 protected:
-	APlayerCharacter* Owner;
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<APlayerCharacter> Owner;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
 	float Damage = 10.0f;
 

@@ -39,7 +39,7 @@ void UGunComponent::TryContinuousPrimaryFire(const FInputActionValue& Value)
 		if(Owner->GetWeaponActionState() == EWeaponActionState::DoNothing &&
 		Owner->GetCrowdControlState() == ECrowdControlState::Normal)
 		{
-			if (GetWorld()->TimeSeconds > LastFireTime + 1 / FireRate)
+			if (GetWorld()->TimeSeconds > (LastFireTime + (1 / FireRate)) or LastFireTime == 0.0f)
 			{
 				DoWeaponPrimaryFire();	
 			}
@@ -60,17 +60,18 @@ void UGunComponent::DoWeaponPrimaryFire()
 	if(Owner->bHitUnderAimOnTick)
 	{
 		AActor* Target = Owner->HitUnderAimOnTick.GetActor();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit Actor : %s"), *Target->GetName()));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hit Actor : %s"), *Target->GetName()));
 		if(Target)
 		{
 			//I want Apply damage to "Target"
 			UGameplayStatics::ApplyDamage(Target, GetWeaponATK(), Owner->GetController(), Owner, UDamageType::StaticClass());
 			UPrimitiveComponent* PrimitiveRoot = Cast<UPrimitiveComponent>(Target->GetRootComponent());
-			if(PrimitiveRoot)
+			if(PrimitiveRoot && PrimitiveRoot->IsSimulatingPhysics())
 			{
 				FVector HitDirection = Owner->HitUnderAimOnTick.ImpactPoint - HandBonePosition;
 				PrimitiveRoot->AddImpulseAtLocation(HitDirection * Momentum, Owner->HitUnderAimOnTick.ImpactPoint);
 			}
 		}
 	}
+	DoWeaponPrimaryFireBP();
 }

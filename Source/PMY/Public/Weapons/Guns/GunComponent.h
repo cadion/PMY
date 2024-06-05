@@ -6,6 +6,7 @@
 #include "Weapons/WeaponComponent.h"
 #include "GunComponent.generated.h"
 
+struct FInputActionValue;
 class UInputAction;
 /**
  * Weapon중 Gun 전용 항목
@@ -61,6 +62,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void DoWeaponPrimaryFire();
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void DoWeaponPrimaryFireBP();
+
+	
 
 #pragma endregion Actions
 	
