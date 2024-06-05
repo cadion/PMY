@@ -34,19 +34,29 @@ void UGunComponent::BeginPlay()
 void UGunComponent::TryContinuousPrimaryFire(const FInputActionValue& Value)
 {
 	Super::TryContinuousPrimaryFire(Value);
-	if(Owner->GetWeaponActionState() == EWeaponActionState::DoNothing &&
-		Owner->GetCrowdControlState() == ECrowdControlState::Normal)
+	if(Owner)
 	{
-		DoWeaponPrimaryFire();
-	}
+		if(Owner->GetWeaponActionState() == EWeaponActionState::DoNothing &&
+		Owner->GetCrowdControlState() == ECrowdControlState::Normal)
+		{
+			if (GetWorld()->TimeSeconds > LastFireTime + 1 / FireRate)
+			{
+				DoWeaponPrimaryFire();	
+			}
+			
+		}	
+	}	
 	
 }
 
 void UGunComponent::DoWeaponPrimaryFire()
 {
 	FVector HandBonePosition = Owner->GetMesh()->GetSocketLocation("hand_r");
-	//Owner->GetAimStartWorldLocation()
+	//발사 효과
 	DrawDebugLine(GetWorld(), HandBonePosition, Owner->HitUnderAimOnTick.ImpactPoint, FColor::Red, false, -1.0f, 0, 1.0f);
+	LastFireTime = GetWorld()->TimeSeconds;
+
+	//피격 효과
 	if(Owner->bHitUnderAimOnTick)
 	{
 		AActor* Target = Owner->HitUnderAimOnTick.GetActor();

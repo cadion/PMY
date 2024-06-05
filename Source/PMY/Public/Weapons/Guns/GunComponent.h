@@ -6,6 +6,7 @@
 #include "Weapons/WeaponComponent.h"
 #include "GunComponent.generated.h"
 
+class UInputAction;
 /**
  * Weapon중 Gun 전용 항목
  */

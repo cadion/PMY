@@ -14,5 +14,5 @@ UMyGameInstance::UMyGameInstance()
 void UMyGameInstance::Init()
 {
 	Super::Init();
-	MySingleton = Cast<UMySingleton>(GEngine->GameSingleton);
+	//MySingleton = Cast<UMySingleton>(GEngine->GameSingleton);
 }

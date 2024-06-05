@@ -151,12 +151,15 @@ public:
 #pragma region states
 
 public:
+	bool TryChangeAimingState(bool bNewAiming);
 	bool TryChangeWeaponActionState(EWeaponActionState NewState);
 	bool TryChangeCrowdControlState(ECrowdControlState NewState);
+	FORCEINLINE bool GetAiming() const { return bIsAiming; }
 	FORCEINLINE EWeaponActionState GetWeaponActionState() const { return WeaponActionState; }
 	FORCEINLINE ECrowdControlState GetCrowdControlState() const { return CrowdControlState; }
 	
 private:
+	bool bIsAiming = false;
 	EWeaponActionState WeaponActionState = EWeaponActionState::DoNothing;
 	ECrowdControlState CrowdControlState = ECrowdControlState::Normal;
 

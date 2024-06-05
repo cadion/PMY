@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Characters/PlayerCharacters/PlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "WeaponComponent.generated.h"
 
+class APlayerCharacter;
+class UInputMappingContext;
 /**
  * 모든 무기의 기본 클래스
  * 무기의 타입과 관계없이 항상 정의되어야 하는 항목들
@@ -31,7 +32,6 @@ class PMY_API UWeaponComponent : public USkeletalMeshComponent
 	GENERATED_BODY()
 
 public:
-	UWeaponComponent();
 	virtual void BeginPlay() override;
 
 	FWeaponCameraSet GetCameraSet() const { return CameraSet; }
@@ -59,12 +59,18 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
-	float WeaponATK = 100.0f;
+	float WeaponATK = 10.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
+	float FireRate = 1.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
 	float Momentum = 0.3f * 330.0f; // kg * cm / s
+	
 
 #pragma endregion WeaponParameters
-
+#pragma region WeaponState
+	UPROPERTY(BlueprintReadWrite)
+	float LastFireTime = 0.0f;
+#pragma endregion WeaponState
 #pragma region Inputs
 public:
 	UFUNCTION()
@@ -79,5 +85,6 @@ public:
 	virtual void TryContinuousPrimaryFire(const FInputActionValue& Value);
 	UFUNCTION(BlueprintCallable)
 	virtual void TryContinuousSecondaryFire(const FInputActionValue& Value);
-	
+
+#pragma endregion Actions
 };

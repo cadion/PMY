@@ -48,4 +48,11 @@ public:
 	void Death();
 
 #pragma endregion Common Action
+
+#pragma region Common State
+
+	UPROPERTY()
+	FTimerHandle DeathTimerHandle;
+	
+#pragma endregion Common State
 };
