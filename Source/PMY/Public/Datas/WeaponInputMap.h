@@ -17,9 +17,13 @@ class PMY_API UWeaponInputMap : public UPrimaryDataAsset
 
 public:
 	UPROPERTY(EditAnywhere)
-	UInputAction* PrimaryFire;
+	UInputAction* PrimaryContinuousFire;
 	UPROPERTY(EditAnywhere)
-	UInputAction* SecondaryFire;
+	UInputAction* PrimarySingleFire;
+	UPROPERTY(EditAnywhere)
+	UInputAction* SecondaryContinuousFire;
+	UPROPERTY(EditAnywhere)
+	UInputAction* SecondarySingleFire;
 	UPROPERTY(EditAnywhere)
 	UInputAction* ReCharge;
 	UPROPERTY(EditAnywhere)

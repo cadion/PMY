@@ -7,6 +7,9 @@
 #include "PlayerCharacterAnimInstance.generated.h"
 
 class APlayerCharacter;
+
+DECLARE_DELEGATE(StartAimDelegate)
+DECLARE_DELEGATE(EndAimDelegate)
 /**
  * 
  */
@@ -19,6 +22,19 @@ public:
 	UPlayerCharacterAnimInstance();
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+#pragma region Delegates
+public:
+	StartAimDelegate StartAimDelegate;
+	EndAimDelegate EndAimDelegate;
+
+protected:
+	UFUNCTION()
+	void StartAim() {bIsAiming = true;}
+	UFUNCTION()
+	void EndAim() {bIsAiming = false;}
+#pragma endregion Delegates
+	
 	
 
 #pragma region Properties

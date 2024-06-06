@@ -6,6 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "WeaponComponent.generated.h"
 
+struct FEnhancedInputActionEventBinding;
 class APlayerCharacter;
 class UInputMappingContext;
 /**
@@ -26,6 +27,18 @@ struct FWeaponCameraSet
 	FVector CameraLookAtOffset = FVector(0.0f, 0.0f, 0.0f);
 };
 
+USTRUCT(BlueprintType)
+struct FMovementSetting
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere)
+	bool bOrientationTowardMovement = false;
+	UPROPERTY(EditAnywhere)
+	float SpeedMagnitude = 1.0f;
+	
+};
+
 UCLASS()
 class PMY_API UWeaponComponent : public USkeletalMeshComponent
 {
@@ -35,6 +48,7 @@ public:
 	virtual void BeginPlay() override;
 
 	FWeaponCameraSet GetCameraSet() const { return CameraSet; }
+	FMovementSetting GetMovementSetting() const { return MovementSetting; }
 
 	UFUNCTION(BlueprintCallable)
 	bool EquipWeapon();
@@ -44,11 +58,11 @@ public:
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<APlayerCharacter> Owner;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
-	float Damage = 10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
 	FWeaponCameraSet CameraSet;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
+	FMovementSetting MovementSetting;
 
 
 #pragma region WeaponParameters
@@ -85,7 +99,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void TryContinuousPrimaryFire(const FInputActionValue& Value);
 	UFUNCTION(BlueprintCallable)
+	virtual void TrySinglePrimaryFire(const FInputActionValue& Value);
+	UFUNCTION(BlueprintCallable)
 	virtual void TryContinuousSecondaryFire(const FInputActionValue& Value);
+	UFUNCTION(BlueprintCallable)
+	virtual void TrySingleSecondaryFire(const FInputActionValue& Value);
 
 #pragma endregion Actions
 };

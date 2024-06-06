@@ -22,4 +22,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UWeaponInputMap> WeaponInputMapData;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widgets")
+	UDataTable* WeaponDataTable;
 };

@@ -10,11 +10,15 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Characters/PlayerCharacters/PlayerCharacterAnimInstance.h"
+#include "Datas/WeaponDataTable.h"
 #include "Datas/WeaponInputMap.h"
 #include "Kismet/GameplayStatics.h"
+#include "System/MyGameInstance.h"
 #include "System/MySingleton.h"
 #include "Weapons/WeaponComponent.h"
 
+struct FWeaponData;
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -54,10 +58,12 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
-	FPSCamera->SetupAttachment(GetMesh(), TEXT("head"));
+	FPSCamera->SetupAttachment(RootComponent);
 	FPSCamera->bUsePawnControlRotation = true;
 
 	TeamNumber = 1;
+
+	
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -67,13 +73,12 @@ void APlayerCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	MyGameInstance = Cast<UMyGameInstance>(GetGameInstance());
+	MySingleton = Cast<UMySingleton>(GEngine->GameSingleton);
 
 	if(WeaponComponentClass)
 	{
-		WeaponComponent = NewObject<UWeaponComponent>(this, WeaponComponentClass);
-		WeaponComponent->RegisterComponent();
-		//WeaponComponent->SetupAttachment(GetMesh(), TEXT("hand_r"));
-		WeaponComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r"));	
+		ChangeWeapon(1);
 	}
 	
 }
@@ -110,6 +115,45 @@ float APlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	//TODO : 체력 감소 조건 및 액션이벤트, 감쇄효과 등 추가
 	Health -= DamageAmount;
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void APlayerCharacter::ChangeWeapon(int32 WeaponIndex)
+{
+	UDataTable* WeaponDataTable = MySingleton->WeaponDataTable;
+	if(WeaponDataTable)
+	{
+		FWeaponData* WeaponData = WeaponDataTable->FindRow<FWeaponData>(FName(*FString::FromInt(WeaponIndex)), TEXT("WeaponIndex"));
+		if(WeaponData)
+		{
+			if(WeaponComponent!=nullptr)
+			{
+				WeaponComponent->DestroyComponent();	
+			}
+			
+			WeaponComponent = NewObject<UWeaponComponent>(this, WeaponData->WeaponClass);
+			WeaponComponent->RegisterComponent();
+			//WeaponComponent->SetupAttachment(GetMesh(), TEXT("hand_r"));
+			WeaponComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r"));
+			WeaponComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+			WeaponComponent->EquipWeapon();
+		}
+	}
+}
+
+void APlayerCharacter::StartAiming()
+{
+	if(UPlayerCharacterAnimInstance* PCAnimInstance = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		PCAnimInstance->StartAimDelegate.ExecuteIfBound();
+	}
+}
+
+void APlayerCharacter::EndAiming()
+{
+	if(UPlayerCharacterAnimInstance* PCAnimInstance = Cast<UPlayerCharacterAnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		PCAnimInstance->EndAimDelegate.ExecuteIfBound();
+	}
 }
 
 bool APlayerCharacter::TryChangeWeaponActionState(EWeaponActionState NewState)
@@ -164,14 +208,18 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//TObjectPtr<UWeaponInputMap> WeaponInputMap = Cast<UMySingleton>(GEngine->GameSingleton)->WeaponInputMapData;
 		if (WeaponInputMap)
 		{
-			EnhancedInputComponent->BindAction(WeaponInputMap->PrimaryFire, ETriggerEvent::Triggered, this, &APlayerCharacter::TryContinuousPrimaryFire);
-			EnhancedInputComponent->BindAction(WeaponInputMap->SecondaryFire, ETriggerEvent::Triggered, this, &APlayerCharacter::TryContinuousSecondaryFire);
+			EnhancedInputComponent->BindAction(WeaponInputMap->PrimaryContinuousFire, ETriggerEvent::Triggered, this, &APlayerCharacter::TryContinuousPrimaryFire);
+			EnhancedInputComponent->BindAction(WeaponInputMap->SecondaryContinuousFire, ETriggerEvent::Triggered, this, &APlayerCharacter::TryContinuousSecondaryFire);
+			EnhancedInputComponent->BindAction(WeaponInputMap->PrimarySingleFire, ETriggerEvent::Triggered, this, &APlayerCharacter::TrySinglePrimaryFire);
+			EnhancedInputComponent->BindAction(WeaponInputMap->SecondarySingleFire, ETriggerEvent::Triggered, this, &APlayerCharacter::TrySingleSecondaryFire);
 		}
+		
 	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+	
 }
 
 void APlayerCharacter::TryContinuousPrimaryFire(const FInputActionValue& Value)
@@ -187,6 +235,22 @@ void APlayerCharacter::TryContinuousSecondaryFire(const FInputActionValue& Value
 	if(WeaponComponent)
 	{
 		WeaponComponent->TryContinuousSecondaryFire(Value);
+	}
+}
+
+void APlayerCharacter::TrySinglePrimaryFire(const FInputActionValue& Value)
+{
+	if (WeaponComponent)
+	{
+		WeaponComponent->TrySinglePrimaryFire(Value);
+	}
+}
+
+void APlayerCharacter::TrySingleSecondaryFire(const FInputActionValue& Value)
+{
+	if(WeaponComponent)
+	{
+		WeaponComponent->TrySingleSecondaryFire(Value);
 	}
 }
 

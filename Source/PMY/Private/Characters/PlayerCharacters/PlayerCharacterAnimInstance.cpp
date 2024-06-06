@@ -13,15 +13,19 @@ void UPlayerCharacterAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
 	// PlayerCharacter = Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	StartAimDelegate.BindUObject(this, &UPlayerCharacterAnimInstance::StartAim);
+	EndAimDelegate.BindUObject(this, &UPlayerCharacterAnimInstance::EndAim);
 }
 
 void UPlayerCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	// if(PlayerCharacter)
-	// {
-	// 	bIsAiming = PlayerCharacter->GetAiming();
-	// }
+	if(PlayerCharacter)
+	{
+		bIsAiming = PlayerCharacter->GetAiming();
+	}
 }
+
 

@@ -4,9 +4,11 @@
 #include "Weapons/WeaponComponent.h"
 
 #include "DelayAction.h"
+#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Characters/PlayerCharacters/PlayerCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Datas/WeaponInputMap.h"
 #include "GameFramework/SpringArmComponent.h"
 
 void UWeaponComponent::BeginPlay()
@@ -15,26 +17,25 @@ void UWeaponComponent::BeginPlay()
 	
 	//Set Owners Camera Setting
 	 Owner = Cast<APlayerCharacter>(GetOwner());
-	 if (Owner)
-	 {
-	 	USpringArmComponent* CameraBoom = Owner->GetCameraBoom();
-	 	UCameraComponent* FollowCamera = Owner->GetFollowCamera();
-	 	if (CameraBoom && FollowCamera)
-	 	{
-	 		CameraBoom->TargetArmLength = CameraSet.CameraDistance;
-	 		FollowCamera->FieldOfView = CameraSet.FOV;
-	 		FollowCamera->SetRelativeLocation(CameraSet.CameraOffset);
-	 		CameraBoom->SocketOffset = CameraSet.CameraLookAtOffset;
-	 	}
-	 }
-	 	
-	 EquipWeapon();
-	
+	 
 	LastFireTime = 0.f;
 }
 
 bool UWeaponComponent::EquipWeapon()
 {
+	if (Owner) // Camera Setting
+	{
+		USpringArmComponent* CameraBoom = Owner->GetCameraBoom();
+		UCameraComponent* FollowCamera = Owner->GetFollowCamera();
+		if (CameraBoom && FollowCamera)
+		{
+			CameraBoom->TargetArmLength = CameraSet.CameraDistance;
+			FollowCamera->FieldOfView = CameraSet.FOV;
+			FollowCamera->SetRelativeLocation(CameraSet.CameraOffset);
+			CameraBoom->SocketOffset = CameraSet.CameraLookAtOffset;
+		}
+	}
+	
 	bool bCanEquipWeapon = true; //TODO : Check if can equip weapon
 	if(bCanEquipWeapon)
 	{
@@ -63,6 +64,16 @@ void UWeaponComponent::TryContinuousPrimaryFire(const FInputActionValue& Value)
 {
 }
 
+void UWeaponComponent::TrySinglePrimaryFire(const FInputActionValue& Value)
+{
+}
+
 void UWeaponComponent::TryContinuousSecondaryFire(const FInputActionValue& Value)
 {
 }
+
+void UWeaponComponent::TrySingleSecondaryFire(const FInputActionValue& Value)
+{
+}
+
+

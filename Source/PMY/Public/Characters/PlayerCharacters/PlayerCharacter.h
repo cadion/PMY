@@ -7,6 +7,8 @@
 #include "Logging/LogMacros.h"
 #include "PlayerCharacter.generated.h"
 
+class UMySingleton;
+class UMyGameInstance;
 class UWeaponInputMap;
 class UWeaponComponent;
 class USpringArmComponent;
@@ -43,6 +45,13 @@ class APlayerCharacter : public AMyCharacter
 {
 	GENERATED_BODY()
 
+public:
+	APlayerCharacter();
+	// To add mapping context
+	virtual void BeginPlay();
+	virtual void Tick(float DeltaSeconds) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	
 #pragma region Components
 public:
 	/** Camera boom positioning the camera behind the character */
@@ -77,7 +86,13 @@ public:
 	FORCEINLINE class UCameraComponent* GetFPSCamera() const { return FPSCamera; }
 
 #pragma endregion Components
-
+#pragma region ExternalReferences
+public:
+	UPROPERTY()
+	TObjectPtr<UMyGameInstance> MyGameInstance;
+	UPROPERTY()
+	TObjectPtr<UMySingleton> MySingleton;
+#pragma endregion ExternalReferences
 #pragma region Inputs
 public:
 	/** MappingContext */
@@ -114,6 +129,10 @@ public:
 	void TryContinuousPrimaryFire(const FInputActionValue& Value);
 	UFUNCTION()
 	void TryContinuousSecondaryFire(const FInputActionValue& Value);
+	UFUNCTION()
+	void TrySinglePrimaryFire(const FInputActionValue& Value);
+	UFUNCTION()
+	void TrySingleSecondaryFire(const FInputActionValue& Value);
 #pragma endregion Weapon Inputs
 
 #pragma region Character Properties
@@ -126,14 +145,6 @@ public:
 	
 	
 #pragma endregion Character Properties
-
-public:
-	APlayerCharacter();
-	// To add mapping context
-	virtual void BeginPlay();
-	virtual void Tick(float DeltaSeconds) override;
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
 #pragma region Tick Events variables
 public:
 	UPROPERTY(BlueprintReadWrite)
@@ -146,8 +157,17 @@ public:
 	bool bHitUnderAimOnTick = false;
 
 #pragma endregion  Tick Events variables
-	
+#pragma region Action
+protected:
+	UFUNCTION(BlueprintCallable)
+	void ChangeWeapon(int32 WeaponIndex);
 
+	UFUNCTION(BlueprintCallable)
+	void StartAiming();
+	UFUNCTION(BlueprintCallable)
+	void EndAiming();
+	
+#pragma endregion Action
 #pragma region states
 
 public:
