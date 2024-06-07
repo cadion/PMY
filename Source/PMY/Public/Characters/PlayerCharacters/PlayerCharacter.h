@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "PlayerCharacter.generated.h"
 
+class USkillManagerComponent;
 class UMySingleton;
 class UMyGameInstance;
 class UWeaponInputMap;
@@ -69,12 +70,16 @@ public:
 	UPROPERTY(visibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UWeaponComponent* WeaponComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivate))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivate = "true"))
 	TObjectPtr<UWeaponInputMap> WeaponInputMap;
 
 	//TODO : Asset Table 참조로 변경 예정
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UWeaponComponent> WeaponComponentClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skill, meta = (AllowPrivateAccess = "true"))
+	USkillManagerComponent* SkillManagerComponent;
+	
 	
 
 public:

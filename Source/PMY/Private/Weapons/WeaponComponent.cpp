@@ -9,6 +9,7 @@
 #include "Characters/PlayerCharacters/PlayerCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Datas/WeaponInputMap.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 void UWeaponComponent::BeginPlay()
@@ -23,6 +24,13 @@ void UWeaponComponent::BeginPlay()
 
 bool UWeaponComponent::EquipWeapon()
 {
+	if(Owner)
+	{
+		if(WeaponAnimInstance)
+    	{
+    		Owner->GetMesh()->SetAnimInstanceClass(WeaponAnimInstance);
+    	}
+	}
 	if (Owner) // Camera Setting
 	{
 		USpringArmComponent* CameraBoom = Owner->GetCameraBoom();
@@ -35,6 +43,20 @@ bool UWeaponComponent::EquipWeapon()
 			CameraBoom->SocketOffset = CameraSet.CameraLookAtOffset;
 		}
 	}
+	if (Owner) // Movement Setting
+	{
+		if(MovementSetting.bOrientationTowardMovement == true)
+		{
+			Owner->bUseControllerRotationYaw = false;
+			Cast<UCharacterMovementComponent>(Owner->GetMovementComponent())->bOrientRotationToMovement = true;
+		}
+		else if(MovementSetting.bOrientationTowardMovement == false)
+		{
+			Owner->bUseControllerRotationYaw = true;
+			Cast<UCharacterMovementComponent>(Owner->GetMovementComponent())->bOrientRotationToMovement = false;
+		}
+	}
+	
 	
 	bool bCanEquipWeapon = true; //TODO : Check if can equip weapon
 	if(bCanEquipWeapon)
@@ -48,7 +70,10 @@ bool UWeaponComponent::EquipWeapon()
 
 bool UWeaponComponent::UnEquipWeapon()
 {
-	
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetWorld()->GetFirstLocalPlayerFromController()))
+	{
+		Subsystem->RemoveMappingContext(WeaponMappingContext);
+	}
 	return true;
 }
 

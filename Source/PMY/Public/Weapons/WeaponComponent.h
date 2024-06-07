@@ -55,16 +55,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool UnEquipWeapon();
 
+#pragma region InitialSetting
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<APlayerCharacter> Owner;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
 	FWeaponCameraSet CameraSet;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivate))
 	FMovementSetting MovementSetting;
-
-
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (AllowPrivate))
+	TSubclassOf<UAnimInstance> WeaponAnimInstance;
+	
+#pragma endregion InitialSetting
 #pragma region WeaponParameters
 public:
 	UFUNCTION(BlueprintCallable)
@@ -104,6 +106,5 @@ public:
 	virtual void TryContinuousSecondaryFire(const FInputActionValue& Value);
 	UFUNCTION(BlueprintCallable)
 	virtual void TrySingleSecondaryFire(const FInputActionValue& Value);
-
 #pragma endregion Actions
 };

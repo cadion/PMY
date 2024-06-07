@@ -14,6 +14,7 @@
 #include "Datas/WeaponDataTable.h"
 #include "Datas/WeaponInputMap.h"
 #include "Kismet/GameplayStatics.h"
+#include "Skill/SkillManagerComponent.h"
 #include "System/MyGameInstance.h"
 #include "System/MySingleton.h"
 #include "Weapons/WeaponComponent.h"
@@ -60,6 +61,9 @@ APlayerCharacter::APlayerCharacter()
 	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
 	FPSCamera->SetupAttachment(RootComponent);
 	FPSCamera->bUsePawnControlRotation = true;
+
+	SkillManagerComponent = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManagerComponent"));
+	
 
 	TeamNumber = 1;
 
@@ -127,6 +131,7 @@ void APlayerCharacter::ChangeWeapon(int32 WeaponIndex)
 		{
 			if(WeaponComponent!=nullptr)
 			{
+				WeaponComponent->UnEquipWeapon();
 				WeaponComponent->DestroyComponent();	
 			}
 			
