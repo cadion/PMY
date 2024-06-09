@@ -13,7 +13,8 @@
 				"UMGEditor",
 				"CoreUObject",
 				"UMG",
-				"AIModule"
+				"AIModule",
+				"EnhancedInput"
 			]
 		}
 	],
