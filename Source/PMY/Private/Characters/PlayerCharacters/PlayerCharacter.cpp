@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Characters/PlayerCharacters/PlayerCharacterAnimInstance.h"
+#include "Characters/PlayerCharacters/StateManagerComponent.h"
 #include "Datas/WeaponDataTable.h"
 #include "Datas/WeaponInputMap.h"
 #include "Kismet/GameplayStatics.h"
@@ -63,6 +64,7 @@ APlayerCharacter::APlayerCharacter()
 	FPSCamera->bUsePawnControlRotation = true;
 
 	SkillManagerComponent = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManagerComponent"));
+
 	
 
 	TeamNumber = 1;
@@ -109,6 +111,11 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 			HitResultWhenNoHit.Normal = GetActorForwardVector();
 			HitUnderAimOnTick = HitResultWhenNoHit;
 		}
+	}
+
+	if(bCameraTransitioning)
+	{
+		UpdateCamera(DeltaSeconds);
 	}
 	
 }
@@ -161,6 +168,11 @@ void APlayerCharacter::EndAiming()
 	}
 }
 
+bool APlayerCharacter::TryChangeAimingState(bool bNewAiming)
+{
+	return true;
+}
+
 bool APlayerCharacter::TryChangeWeaponActionState(EWeaponActionState NewState)
 {
 	if(true) //TODO : Add condition
@@ -179,6 +191,62 @@ bool APlayerCharacter::TryChangeCrowdControlState(ECrowdControlState NewState)
 		return true;
 	}
 	return false;
+}
+
+void APlayerCharacter::SetDesireCameraSet(const FWeaponCameraSet& NewCameraSet, float TransitionSpeed)
+{
+	DesireCameraSet = NewCameraSet;
+	CameraTransitionSpeed = TransitionSpeed;
+	if (IsEqualCameraSet(CurrentCameraSet, DesireCameraSet))
+	{
+		bCameraTransitioning = false;
+	}
+	else
+	{
+		if(CameraTransitionSpeed <= 0.f)
+		{
+			SetCamera(DesireCameraSet);
+		}
+		bCameraTransitioning = true;
+	}
+}
+
+bool APlayerCharacter::IsEqualCameraSet(const FWeaponCameraSet& CameraSet1, const FWeaponCameraSet& CameraSet2)
+{
+	if (CameraSet1.FOV == CameraSet2.FOV &&
+		CameraSet1.CameraDistance == CameraSet2.CameraDistance &&
+		CameraSet1.CameraOffset == CameraSet2.CameraOffset &&
+		CameraSet1.CameraLookAtOffset == CameraSet2.CameraLookAtOffset)
+	{
+		return true;
+	}
+	return false;
+}
+
+void APlayerCharacter::UpdateCamera(float DeltaSeconds)
+{
+	float CurrentCameraDistance = abs(CurrentCameraSet.CameraDistance - DesireCameraSet.CameraDistance); 
+	if(CurrentCameraDistance < DeltaSeconds * CameraTransitionSpeed)
+	{
+		SetCamera(DesireCameraSet);
+		bCameraTransitioning = false;
+	}
+	else
+	{
+		FVector NewCameraOffset = FMath::VInterpTo(CurrentCameraSet.CameraOffset, DesireCameraSet.CameraOffset, DeltaSeconds, CameraTransitionSpeed);
+		float NewCameraDistance = FMath::FInterpTo(CurrentCameraSet.CameraDistance, DesireCameraSet.CameraDistance, DeltaSeconds, CameraTransitionSpeed);
+		FVector NewCameraLookAtOffset = FMath::VInterpTo(CurrentCameraSet.CameraLookAtOffset, DesireCameraSet.CameraLookAtOffset, DeltaSeconds, CameraTransitionSpeed);
+		SetCamera(FWeaponCameraSet{DesireCameraSet.FOV, NewCameraDistance, NewCameraOffset, NewCameraLookAtOffset});
+	}
+}
+
+void APlayerCharacter::SetCamera(FWeaponCameraSet NewCameraSet)
+{
+	CurrentCameraSet = NewCameraSet;
+	FollowCamera->FieldOfView = NewCameraSet.FOV;
+	CameraBoom->TargetArmLength = NewCameraSet.CameraDistance;
+	FollowCamera->SetRelativeLocation(NewCameraSet.CameraOffset);
+	CameraBoom->SocketOffset = NewCameraSet.CameraLookAtOffset;
 }
 
 //////////////////////////////////////////////////////////////////////////

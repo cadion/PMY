@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "MyCharacter.generated.h"
 
+class UStateManagerComponent;
+
 UCLASS()
 class PMY_API AMyCharacter : public ACharacter
 {
@@ -30,6 +32,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyCharacter")
 	int TeamNumber = 0; // 0 is neutral, 1 is player, 2 is enemy
 
+#pragma region Components
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyCharacter")
+	UStateManagerComponent* StateManagerComponent;
+#pragma endregion Components
 #pragma region Common Properties
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyCharacter")
@@ -38,7 +45,6 @@ public:
 	float Health = MaxHealth;
 
 #pragma endregion Common Properties
-
 #pragma region Common Action
 
 public:
@@ -48,11 +54,11 @@ public:
 	void Death();
 
 #pragma endregion Common Action
-
 #pragma region Common State
 
 	UPROPERTY()
 	FTimerHandle DeathTimerHandle;
 	
 #pragma endregion Common State
+	
 };

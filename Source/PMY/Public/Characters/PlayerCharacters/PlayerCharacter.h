@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "Characters/MyCharacter.h"
 #include "Logging/LogMacros.h"
+#include "Weapons/WeaponComponent.h"
 #include "PlayerCharacter.generated.h"
 
+class UStateManagerComponent;
+struct FWeaponCameraSet;
 class USkillManagerComponent;
 class UMySingleton;
 class UMyGameInstance;
@@ -79,6 +82,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skill, meta = (AllowPrivateAccess = "true"))
 	USkillManagerComponent* SkillManagerComponent;
+
 	
 	
 
@@ -176,17 +180,43 @@ protected:
 #pragma region states
 
 public:
+	UFUNCTION()
 	bool TryChangeAimingState(bool bNewAiming);
+	UFUNCTION()
 	bool TryChangeWeaponActionState(EWeaponActionState NewState);
+	UFUNCTION()
 	bool TryChangeCrowdControlState(ECrowdControlState NewState);
+	UFUNCTION()
 	FORCEINLINE bool GetAiming() const { return bIsAiming; }
+	UFUNCTION()
 	FORCEINLINE EWeaponActionState GetWeaponActionState() const { return WeaponActionState; }
+	UFUNCTION()
 	FORCEINLINE ECrowdControlState GetCrowdControlState() const { return CrowdControlState; }
+	UFUNCTION()
+	void SetDesireCameraSet(const FWeaponCameraSet& NewCameraSet, float TransitionSpeed);
+	UFUNCTION()
+	bool IsEqualCameraSet(const FWeaponCameraSet& CameraSet1, const FWeaponCameraSet& CameraSet2);
+
+protected:
+	UFUNCTION()
+	void UpdateCamera(float DeltaSeconds);
+	UFUNCTION()
+	void SetCamera(FWeaponCameraSet NewCameraSet);
 	
 private:
 	bool bIsAiming = false;
 	EWeaponActionState WeaponActionState = EWeaponActionState::DoNothing;
 	ECrowdControlState CrowdControlState = ECrowdControlState::Normal;
+
+	UPROPERTY()
+	FWeaponCameraSet DesireCameraSet = FWeaponCameraSet();
+	UPROPERTY()
+	FWeaponCameraSet CurrentCameraSet = FWeaponCameraSet();
+	UPROPERTY()
+	float CameraTransitionSpeed = 0.f;
+	UPROPERTY()
+	bool bCameraTransitioning = false;
+	
 
 #pragma endregion states
 };

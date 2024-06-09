@@ -35,13 +35,14 @@ bool UWeaponComponent::EquipWeapon()
 	{
 		USpringArmComponent* CameraBoom = Owner->GetCameraBoom();
 		UCameraComponent* FollowCamera = Owner->GetFollowCamera();
-		if (CameraBoom && FollowCamera)
-		{
-			CameraBoom->TargetArmLength = CameraSet.CameraDistance;
-			FollowCamera->FieldOfView = CameraSet.FOV;
-			FollowCamera->SetRelativeLocation(CameraSet.CameraOffset);
-			CameraBoom->SocketOffset = CameraSet.CameraLookAtOffset;
-		}
+		Owner->SetDesireCameraSet(CameraSet, 4.f); // Set Camera Setting to PlayerCharacter
+		// if (CameraBoom && FollowCamera)
+		// {
+		// 	CameraBoom->TargetArmLength = CameraSet.CameraDistance;
+		// 	FollowCamera->FieldOfView = CameraSet.FOV;
+		// 	FollowCamera->SetRelativeLocation(CameraSet.CameraOffset);
+		// 	CameraBoom->SocketOffset = CameraSet.CameraLookAtOffset;
+		// }
 	}
 	if (Owner) // Movement Setting
 	{
