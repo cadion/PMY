@@ -9,6 +9,11 @@ AWeaponActor::AWeaponActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMesh->SetupAttachment(Root);
+	
 }
 
 // Called when the game starts or when spawned
@@ -23,5 +28,27 @@ void AWeaponActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AWeaponActor::Owned(APlayerCharacter* NewOwnerPlayerCharacter)
+{
+	OwnerPlayerCharacter = NewOwnerPlayerCharacter;
+}
+
+void AWeaponActor::Equipped()
+{
+	EndSwithcing(); //TODO Switching Anim Play, Anim Notify에서 EndSwitching 호출
+}
+
+void AWeaponActor::EndSwithcing()
+{
+}
+
+void AWeaponActor::UnEquipped()
+{
+}
+
+void AWeaponActor::TryTriggerAction()
+{
 }
 

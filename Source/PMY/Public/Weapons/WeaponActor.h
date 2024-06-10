@@ -6,34 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "WeaponActor.generated.h"
 
-UENUM(BlueprintType)
-enum EGunActionState : uint8
-{
-	Idle = 0,
-	OnFiring,
-	NeedLoad,
-	Reloading,
-	NeedReload,
-	MovableCharging,
-	UnMovableCharging,
-};
 
-UENUM(BlueprintType)
-enum EGunAimingState
-{
-	HipFire = 0,
-	AimedFire,
-	AimDownSight,
-};
-
-UENUM()
-enum EFireMode
-{
-	FullAuto = 0,
-	SemiAuto,
-	Burst,
-	Manual,	
-};
+class APlayerCharacter;
 
 UCLASS()
 class PMY_API AWeaponActor : public AActor
@@ -52,4 +26,39 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+#pragma region ExternalRef
+
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon")
+	APlayerCharacter* OwnerPlayerCharacter;
+
+#pragma endregion ExternalRef
+	
+#pragma region Component
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+	class USceneComponent* Root;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Weapon")
+	class USkeletalMeshComponent* WeaponMesh;
+#pragma endregion Component
+	
+#pragma region Action
+	UFUNCTION(BlueprintCallable)
+	virtual void Owned(APlayerCharacter* NewOwnerPlayerCharacter);
+	UFUNCTION(BlueprintCallable)
+	virtual void Equipped();
+	UFUNCTION()
+	virtual void EndSwithcing();
+	UFUNCTION(BlueprintCallable)
+	virtual void UnEquipped();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void TryTriggerAction();
+	
+#pragma endregion Action
+	
+#pragma region Property
+#pragma endregion Property
+	
+#pragma region State
+#pragma endregion State
 };
