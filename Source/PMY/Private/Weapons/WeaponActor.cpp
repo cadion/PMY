@@ -30,9 +30,9 @@ void AWeaponActor::Tick(float DeltaTime)
 
 }
 
-void AWeaponActor::Owned(APlayerCharacter* NewOwnerPlayerCharacter)
+void AWeaponActor::Owned(UWeaponManagerComponent* NewWeaponManagerComponent)
 {
-	OwnerPlayerCharacter = NewOwnerPlayerCharacter;
+	WeaponManagerComponent = NewWeaponManagerComponent;
 }
 
 void AWeaponActor::Equipped()

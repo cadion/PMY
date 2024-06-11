@@ -29,7 +29,7 @@ public:
 #pragma region ExternalRef
 
 	UPROPERTY(BlueprintReadOnly, Category = "Weapon")
-	APlayerCharacter* OwnerPlayerCharacter;
+	UWeaponManagerComponent* WeaponManagerComponent; // OwnerPlayerCharacter는 WeaponManager의 OwnerPlayerCharacter를 통해 접근
 
 #pragma endregion ExternalRef
 	
@@ -43,7 +43,7 @@ public:
 	
 #pragma region Action
 	UFUNCTION(BlueprintCallable)
-	virtual void Owned(APlayerCharacter* NewOwnerPlayerCharacter);
+	virtual void Owned(UWeaponManagerComponent* NewWeaponManagerComponent);
 	UFUNCTION(BlueprintCallable)
 	virtual void Equipped();
 	UFUNCTION()

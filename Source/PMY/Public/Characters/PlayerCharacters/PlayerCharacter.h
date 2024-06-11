@@ -8,6 +8,7 @@
 #include "Weapons/WeaponComponent.h"
 #include "PlayerCharacter.generated.h"
 
+class UWeaponManagerComponent;
 class UStateManagerComponent;
 struct FWeaponCameraSet;
 class USkillManagerComponent;
@@ -83,6 +84,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Skill, meta = (AllowPrivateAccess = "true"))
 	USkillManagerComponent* SkillManagerComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
+	UWeaponManagerComponent* WeaponManagerComponent;
 	
 	
 

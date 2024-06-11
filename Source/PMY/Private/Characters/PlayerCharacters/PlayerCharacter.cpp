@@ -18,7 +18,9 @@
 #include "Skill/SkillManagerComponent.h"
 #include "System/MyGameInstance.h"
 #include "System/MySingleton.h"
+#include "Weapons/WeaponActor.h"
 #include "Weapons/WeaponComponent.h"
+#include "Weapons/WeaponManagerComponent.h"
 
 struct FWeaponData;
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -64,6 +66,7 @@ APlayerCharacter::APlayerCharacter()
 	FPSCamera->bUsePawnControlRotation = true;
 
 	SkillManagerComponent = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManagerComponent"));
+	WeaponManagerComponent = CreateDefaultSubobject<UWeaponManagerComponent>(TEXT("WeaponManagerComponent"));
 
 	
 
@@ -142,7 +145,7 @@ void APlayerCharacter::ChangeWeapon(int32 WeaponIndex)
 				WeaponComponent->DestroyComponent();	
 			}
 			
-			WeaponComponent = NewObject<UWeaponComponent>(this, WeaponData->WeaponClass);
+			WeaponComponent = NewObject<UWeaponComponent>(this, WeaponData->WeaponComponentClass);
 			WeaponComponent->RegisterComponent();
 			//WeaponComponent->SetupAttachment(GetMesh(), TEXT("hand_r"));
 			WeaponComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r"));

@@ -7,6 +7,7 @@
 #include "WeaponDataTable.generated.h"
 
 
+class AWeaponActor;
 class UWeaponComponent;
 
 USTRUCT()
@@ -15,9 +16,13 @@ struct FWeaponData : public FTableRowBase
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UWeaponComponent> WeaponClass;
+	TSubclassOf<UWeaponComponent> WeaponComponentClass;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AWeaponActor> WeaponClass;
 	UPROPERTY(EditDefaultsOnly)
 	FString WeaponName;
+	
+	
 	//TODO : CrossHair Widget Class
 };
 
