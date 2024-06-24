@@ -39,32 +39,8 @@ public:
 #pragma region Action
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void TrySpawnWeapon(TSubclassOf<AWeaponActor> NewWeaponClass, bool bEquipWhenSpawned = true);
-	UFUNCTION(Server, Reliable)
-	void TrySpawnWeapon_Server(TSubclassOf<AWeaponActor> NewWeaponClass, uint8 TargetSlot, bool bEquipWhenSpawned);
-	UFUNCTION(Client, Reliable)
-	void TrySpawnWeapon_Client(AWeaponActor* NewWeapon, uint8 TargetSlot, bool bEquipWhenSpawned);
+
 	
-	
-	
-public:
-	UFUNCTION(BlueprintCallable)
-	void SwitchWeapon();
-	UFUNCTION()
-	void CallChangeWeapon(uint8 TargetSlot);
-	UFUNCTION(Server, Reliable)
-	void ChangeWeapon_Server(uint8 TargetSlot);
-	UFUNCTION(Client, Reliable)
-	void ChangeWeapon_Client(uint8 TargetSlot);
-	UFUNCTION()
-	void ChangeWeapon(uint8 TargetSlot);
-	UFUNCTION(BlueprintCallable)
-	void DropWeapon(uint8 TargetSlot);
-	UFUNCTION(Server, Reliable)
-	void DropWeapon_Server(uint8 TargetSlot);
-	UFUNCTION(Client, Reliable)
-	void DropWeapon_Client(uint8 TargetSlot);
 	
 #pragma endregion Action
 
@@ -72,4 +48,11 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	uint8 CurrentWeaponSlot = 0;
 #pragma endregion State
+
+#pragma region Property
+	UPROPERTY()
+	FName EquippedSocketName = FName("hand_r");
+	UPROPERTY()
+	FName UnEquippedSocketName = FName("spine_02");
+#pragma endregion Property
 };

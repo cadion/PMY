@@ -20,8 +20,12 @@ void AMyPlayerController::BeginPlay()
 	
 	if(MyGameInstance->GetMySingleton())
 	{
-		DynamicActionGroup = CreateWidget<UDynamicActionGroupWidget>(this, MyGameInstance->GetMySingleton()->DynamicActionGroupClass);
-		DynamicActionGroup->AddToViewport();
+		if(IsLocalPlayerController())
+		{
+			DynamicActionGroup = CreateWidget<UDynamicActionGroupWidget>(this, MyGameInstance->GetMySingleton()->DynamicActionGroupClass);
+			DynamicActionGroup->AddToViewport();	
+		}
+		
 	}
 	
 }
