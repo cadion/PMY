@@ -24,7 +24,6 @@ void AZombie::BeginPlay()
 	for (auto Ability : Abilities)
 	{
 		FGameplayAbilitySpecHandle Handle = ASC->GiveAbility(FGameplayAbilitySpec(Ability, 1, InputId++));
-		ASC->TryActivateAbility(Handle);
 	}
 }
 
@@ -45,5 +44,11 @@ void AZombie::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 UAbilitySystemComponent* AZombie::GetAbilitySystemComponent() const
 {
 	return ASC;
+}
+
+void AZombie::ActivateAbility(int32 Index)
+{
+	ASC->TryActivateAbility(ASC->FindAbilitySpecFromInputID(Index)->Handle);
+	
 }
 
